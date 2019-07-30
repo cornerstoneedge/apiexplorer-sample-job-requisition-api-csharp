@@ -1,40 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
-using System.Collections.Specialized;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Sample
 {
     public class HttpClientHelper
     {
         private HttpClient _client;
-        private HttpClientParameters _httpClientParameters;
-        private string _result;
-        private bool _success;
 
-        public string Result { get { return _result; } }
-
-        public bool Success { get { return _success; } }
         public HttpClientHelper(HttpClientParameters httpClientParameters)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3
                                                    | SecurityProtocolType.Tls
                                                    | SecurityProtocolType.Tls11
                                                    | SecurityProtocolType.Tls12;
-            _httpClientParameters = httpClientParameters;
+            HttpClientParameters = httpClientParameters;
         }
 
-        public HttpClientParameters HttpClientParameters { get { return _httpClientParameters; } }
+        public string Result { get; private set; }
 
-       
+        public bool Success { get; private set; }
+
+        public HttpClientParameters HttpClientParameters { get; }
+
+
         public async Task<bool> CallService()
         {
-
             if (HttpClientParameters.EndPoint.IsNullOrBlank())
             {
                 throw new Exception("ServiceURL Cannot be blank");
@@ -49,14 +44,17 @@ namespace Sample
             {
                 BaseAddress = new Uri(HttpClientParameters.EndPoint),
                 // Set timeout to infinite because Edge API service has its own timeout.
-                Timeout = Timeout.InfiniteTimeSpan,
+                Timeout = Timeout.InfiniteTimeSpan
             };
 
             var request = new HttpRequestMessage
             {
                 RequestUri = new Uri(HttpClientParameters.EndPoint),
                 Method = GetVerb(HttpClientParameters.Method),
-                Content = HttpClientParameters.Method == "GET" ? null : new StringContent(HttpClientParameters.Body, HttpClientParameters.EncodingType, HttpClientParameters.ContentType)
+                Content = HttpClientParameters.Method == "GET"
+                    ? null
+                    : new StringContent(HttpClientParameters.Body, HttpClientParameters.EncodingType,
+                        HttpClientParameters.ContentType)
             };
 
             AddHeadersToRequest(HttpClientParameters.Headers, request);
@@ -65,12 +63,14 @@ namespace Sample
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                _result = content;
-                _success = true;
+                Result = content;
+                Success = true;
                 return Success;
             }
-            _result = $"Service Call failed with '{(int)response.StatusCode}' '{response.ReasonPhrase}'  '{response.Content.ReadAsStringAsync().Result}'.";
-            _success = false;
+
+            Result =
+                $"Service Call failed with '{(int) response.StatusCode}' '{response.ReasonPhrase}'  '{response.Content.ReadAsStringAsync().Result}'.";
+            Success = false;
             Console.WriteLine(Result);
             throw new Exception(Result);
         }
@@ -86,7 +86,7 @@ namespace Sample
 
         private HttpMethod GetVerb(string Method)
         {
-            HttpMethod httpMethod = HttpMethod.Get;
+            var httpMethod = HttpMethod.Get;
             Method = Method.ToUpper();
             switch (Method)
             {
@@ -105,8 +105,8 @@ namespace Sample
                 case "DELETE":
                     httpMethod = HttpMethod.Delete;
                     break;
-
             }
+
             return httpMethod;
         }
     }

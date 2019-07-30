@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.Net;
 using System.Text;
@@ -11,22 +10,20 @@ namespace Sample
     {
         public static async Task<string> CallApi(string accessToken)
         {
-           
-
             var headers = new NameValueCollection();
 
             headers.Add("Authorization", Util.BuildAuthorizationHeader(accessToken));
 
-            var httpClientParameters = new HttpClientParameters()
+            var httpClientParameters = new HttpClientParameters
             {
-                EndPoint = Portal.ServiceURL,               
+                EndPoint = Portal.ServiceURL,
                 Method = WebRequestMethods.Http.Get,
                 EncodingType = Encoding.UTF8,
                 Headers = headers,
                 ContentType = "application/json"
             };
 
-            HttpClientHelper httpClientHelper = new HttpClientHelper(httpClientParameters);
+            var httpClientHelper = new HttpClientHelper(httpClientParameters);
 
             await httpClientHelper.CallService();
 

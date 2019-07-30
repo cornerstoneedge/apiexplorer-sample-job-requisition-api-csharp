@@ -1,15 +1,13 @@
 ﻿using System;
 
-
 namespace Sample
 {
-
     /// <summary>
-    /// Generating the Bearer Token from OAuth Token Implementation and calling Employee API using Bearer Token.
+    ///     Generating the Bearer Token from OAuth Token Implementation and calling Employee API using Bearer Token.
     /// </summary>
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Util.Validate();
 
