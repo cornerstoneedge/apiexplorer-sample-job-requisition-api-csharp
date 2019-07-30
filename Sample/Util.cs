@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-
 
 namespace Sample
 {
@@ -13,8 +11,8 @@ namespace Sample
         {
             try
             {
-                StringBuilder sb = new StringBuilder();
-                Dictionary<string, string> dictionary = new Dictionary<string, string>();
+                var sb = new StringBuilder();
+                var dictionary = new Dictionary<string, string>();
                 dictionary.Add("clientId", Portal.ClientId);
                 dictionary.Add("clientSecret", Portal.ClientSecret);
                 dictionary.Add("grantType", Portal.GrantType);
@@ -30,29 +28,31 @@ namespace Sample
 
         public static string CreateHttpRequestDataJSON(Dictionary<string, string> dictionary)
         {
-            StringBuilder _sbParameters = new StringBuilder();
-            char doublequotes = '"';
-            int max = 0;
+            var _sbParameters = new StringBuilder();
+            var doublequotes = '"';
+            var max = 0;
             _sbParameters.AppendLine("{");
-            foreach (string param in dictionary.Keys)
+            foreach (var param in dictionary.Keys)
             {
-                _sbParameters.Append(doublequotes + param + doublequotes);//key => parameter name 
+                _sbParameters.Append(doublequotes + param + doublequotes); //key => parameter name 
                 _sbParameters.Append(':');
-                _sbParameters.Append(doublequotes + dictionary[param] + doublequotes);//key value                
+                _sbParameters.Append(doublequotes + dictionary[param] + doublequotes); //key value                
                 if (max < dictionary.Keys.Count - 1)
                 {
                     _sbParameters.Append(",");
                 }
+
                 _sbParameters.AppendLine("");
                 max++;
             }
+
             _sbParameters.AppendLine("}");
             return _sbParameters.ToString();
         }
-   
+
         public static string BuildAuthorizationHeader(string accesstoken)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("Bearer " + accesstoken);
 
             return sb.ToString();
@@ -64,14 +64,17 @@ namespace Sample
             {
                 throw new Exception("ClientId Cannot be blank");
             }
+
             if (Portal.ClientSecret.IsNullOrBlank())
             {
                 throw new Exception("ClientSecret Cannot be blank");
             }
+
             if (Portal.Scope.IsNullOrBlank())
             {
                 throw new Exception("Scope Cannot be blank. It should be 'all' ");
             }
+
             if (Portal.GrantType.IsNullOrBlank())
             {
                 throw new Exception("GrantType Cannot be blank. It should be'client_credentials' ");
@@ -79,10 +82,9 @@ namespace Sample
 
             if (Portal.OAuth2URL.IsNullOrBlank() || Portal.ServiceURL.IsNullOrBlank())
             {
-                throw new Exception("OAuth2URL and ServiceURL Cannot be blank");               
+                throw new Exception("OAuth2URL and ServiceURL Cannot be blank");
             }
 
-          
 
             return true;
         }
